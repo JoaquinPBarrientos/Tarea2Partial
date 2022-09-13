@@ -1,13 +1,25 @@
-import cv2
+# Importamos librerias a utilizar
 from matplotlib import pyplot as plt
 import numpy as np
 import skimage
+import math
+from skimage import io
+
+def PSNR(img1, img2):
+    mse = np.mean((img1 - img2) ** 2)
+    if mse == 0:
+        return 100
+    pm = 255.0
+    return 20 * math.log10(pm / math.sqrt(mse))
+
 
 # Abrimos imagen para trabajar.
-imagen = cv2.imread('1.jpg')
-imagen = cv2.cvtColor(imagen, cv2.COLOR_BGR2RGB)
+
+imagen = skimage.io.imread('1.jpg')
+imagen = skimage.img_as_float(imagen)
 
 # Agregamos ruido Salt and Pepper en tres niveles de ruido distintos.
+
 imagen_sp_1 = skimage.util.random_noise(imagen, mode='s&p', amount=0.1)
 imagen_sp_2 = skimage.util.random_noise(imagen, mode='s&p', amount=0.5)
 imagen_sp_3 = skimage.util.random_noise(imagen, mode='s&p', amount=0.9)
@@ -83,3 +95,28 @@ plt.axis('off')
 plt.imshow(imagen_poisson_1)
 
 plt.show()
+
+# Realizamos PSNR para cada imagen con ruido.
+# PSNR para ruido Salt and Pepper en distintos niveles.
+psnr_sp_1 = PSNR(imagen, imagen_sp_1)
+psnr_sp_2 = PSNR(imagen, imagen_sp_2)
+psnr_sp_3 = PSNR(imagen, imagen_sp_3)
+
+
+# PSNR para ruido Gaussiano en distintos niveles.
+psnr_gauss_1 = PSNR(imagen, imagen_gauss_1)
+psnr_gauss_2 = PSNR(imagen, imagen_gauss_2)
+psnr_gauss_3 = PSNR(imagen, imagen_gauss_3)
+
+# PSNR para ruido Poisson en distintos niveles.
+psnr_poisson_1 = PSNR(imagen, imagen_poisson_1)
+
+# Mostramos los resultados de PSNR.
+print('PSNR para ruido Salt and Pepper 10%: ', psnr_sp_1)
+print('PSNR para ruido Salt and Pepper 50%: ', psnr_sp_2)
+print('PSNR para ruido Salt and Pepper 90%: ', psnr_sp_3)
+print('PSNR para ruido Gaussiano 10%: ', psnr_gauss_1)
+print('PSNR para ruido Gaussiano 50%: ', psnr_gauss_2)
+print('PSNR para ruido Gaussiano 90%: ', psnr_gauss_3)
+print('PSNR para ruido Poisson: ', psnr_poisson_1)
+
